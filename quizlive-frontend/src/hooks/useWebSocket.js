@@ -69,6 +69,16 @@ export function useWebSocket(sessionCode, role, token = null) {
       case 'leaderboard.updated':
         game.setLeaderboard(msg.payload)
         break
+      case 'question.extended':
+        game.extendQuestionTime(msg.payload)
+        useToastStore.getState().info(`Timer extended by ${msg.payload.added_seconds}s`)
+        break
+      case 'score.adjusted':
+        // leaderboard.updated arrives right after with the recomputed rankings.
+        useToastStore.getState().info(
+          `Score adjusted: ${msg.payload.delta > 0 ? '+' : ''}${msg.payload.delta}`,
+        )
+        break
       case 'game.paused':
         game.setPaused()
         break

@@ -8,6 +8,7 @@ import { useGameStore } from '../stores/game.store.js'
 import { useWsStore }   from '../stores/ws.store.js'
 import { startSession } from '../lib/api.js'
 import SessionControl from '../components/host/SessionControl.jsx'
+import QuestionQueue  from '../components/host/QuestionQueue.jsx'
 import TeamList       from '../components/host/TeamList.jsx'
 import Leaderboard    from '../components/common/Leaderboard.jsx'
 import QRCode         from '../components/common/QRCode.jsx'
@@ -112,10 +113,13 @@ export default function SessionDetail() {
           </div>
         </div>
 
-        {/* Middle: Control */}
+        {/* Middle: Control + question queue */}
         <div className="col-span-1 flex flex-col gap-4">
           {['lobby', 'active', 'paused'].includes(session.status) && (
-            <SessionControl sessionId={id} onForceNext={() => setForceModal(true)} />
+            <>
+              <SessionControl onForceNext={() => setForceModal(true)} />
+              <QuestionQueue />
+            </>
           )}
           {session.status === 'draft' && (
             <div className="bg-gray-900 border border-gray-800 rounded-2xl p-6 text-center">

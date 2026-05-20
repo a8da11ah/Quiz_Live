@@ -145,15 +145,28 @@ func (r *Room) RegisterHost(c *Client) {
 	phase := string(r.phase)
 	totalQ := len(r.questions)
 	curQ := r.currentQ
+
+	// Queue: lightweight per-question metadata (host-only, no answer keys).
+	queue := make([]map[string]any, len(r.questions))
+	for i, qs := range r.questions {
+		queue[i] = map[string]any{
+			"index":              i,
+			"title":              qs.question.Title,
+			"type":               qs.question.Type,
+			"time_limit_seconds": qs.timeLimitSeconds,
+			"points_value":       qs.pointsValue,
+		}
+	}
 	r.mu.Unlock()
 
 	if sess != nil {
 		c.SendMsg("state.sync", map[string]any{
-			"phase":            phase,
-			"session":          sess,
-			"teams":            teams,
-			"total_questions":  totalQ,
-			"current_index":    curQ,
+			"phase":           phase,
+			"session":         sess,
+			"teams":           teams,
+			"total_questions": totalQ,
+			"current_index":   curQ,
+			"questions":       queue,
 		})
 	}
 }
@@ -215,6 +228,27 @@ func (r *Room) handleHostMessage(c *Client, msg InMessage) {
 		if err := json.Unmarshal(msg.Payload, &p); err == nil {
 			r.handleKick(p.TeamID)
 		}
+	case "host.skip_question":
+		r.handleSkipQuestion(c)
+	case "host.extend_time":
+		var p struct {
+			Seconds int `json:"seconds"`
+		}
+		if err := json.Unmarshal(msg.Payload, &p); err != nil {
+			c.SendError("invalid extend_time payload")
+			return
+		}
+		r.handleExtendTime(c, p.Seconds)
+	case "host.adjust_score":
+		var p struct {
+			TeamID uuid.UUID `json:"team_id"`
+			Delta  int       `json:"delta"`
+		}
+		if err := json.Unmarshal(msg.Payload, &p); err != nil {
+			c.SendError("invalid adjust_score payload")
+			return
+		}
+		r.handleAdjustScore(c, p.TeamID, p.Delta)
 	default:
 		c.SendError("unknown message type: " + msg.Type)
 	}
@@ -496,6 +530,102 @@ func (r *Room) handleFinish() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.finishLocked()
+}
+
+// handleSkipQuestion forcibly closes the active question now, instead of
+// waiting for the timer to expire.
+func (r *Room) handleSkipQuestion(c *Client) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if r.phase != phaseQuestion {
+		c.SendError("not in question phase")
+		return
+	}
+	r.closeQuestionLocked()
+}
+
+// handleExtendTime adds `seconds` to the current question's time limit and
+// reschedules the auto-close timer.  Broadcasts question.extended so clients
+// can refresh their countdowns.
+func (r *Room) handleExtendTime(c *Client, seconds int) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.phase != phaseQuestion {
+		c.SendError("not in question phase")
+		return
+	}
+	if seconds < 1 || seconds > 300 {
+		c.SendError("seconds must be between 1 and 300")
+		return
+	}
+	if r.isPaused {
+		c.SendError("cannot extend a paused question")
+		return
+	}
+
+	// Bump the configured limit and reschedule the timer.
+	r.questions[r.currentQ].timeLimitSeconds += seconds
+	newLimit := r.questions[r.currentQ].timeLimitSeconds
+
+	elapsed := time.Since(r.questionStartedAt)
+	total := time.Duration(newLimit) * time.Second
+	remaining := total - elapsed
+	if remaining < 0 {
+		remaining = time.Duration(seconds) * time.Second
+	}
+
+	if r.timer != nil {
+		r.timer.Stop()
+	}
+	r.timer = time.AfterFunc(remaining, func() {
+		r.mu.Lock()
+		defer r.mu.Unlock()
+		r.closeQuestionLocked()
+	})
+
+	r.broadcastLocked("question.extended", map[string]any{
+		"added_seconds":          seconds,
+		"new_time_limit_seconds": newLimit,
+		"remaining_ms":           remaining.Milliseconds(),
+	})
+}
+
+// handleAdjustScore lets the host nudge a team's score by `delta` (positive or
+// negative). Persists to DB, updates in-memory team, broadcasts an updated
+// leaderboard so every client refreshes.
+func (r *Room) handleAdjustScore(c *Client, teamID uuid.UUID, delta int) {
+	if delta == 0 {
+		return
+	}
+
+	r.mu.Lock()
+	team, ok := r.dbTeams[teamID]
+	r.mu.Unlock()
+	if !ok {
+		c.SendError("team not found in this session")
+		return
+	}
+
+	if err := r.hub.teamStore.UpdateScore(context.Background(), teamID, delta); err != nil {
+		slog.Error("adjust score", "err", err)
+		c.SendError("failed to update score")
+		return
+	}
+
+	r.mu.Lock()
+	team.Score += delta
+	rankings := r.buildRankings()
+	r.mu.Unlock()
+
+	r.broadcastLocked("score.adjusted", map[string]any{
+		"team_id":   teamID,
+		"delta":     delta,
+		"new_score": team.Score,
+	})
+	r.broadcastLocked("leaderboard.updated", map[string]any{
+		"rankings": rankings,
+	})
 }
 
 func (r *Room) handleKick(teamID uuid.UUID) {

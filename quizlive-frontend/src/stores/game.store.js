@@ -43,6 +43,12 @@ export const useGameStore = create((set, get) => ({
   // Host-only: pending open_text marks
   pendingMarks: 0,
 
+  // Host-only: full question queue [{ index, title, type, time_limit_seconds, points_value }]
+  questionsQueue: [],
+
+  // Host-only: index of currently-running (or last-shown) question
+  currentIndex: 0,
+
   // Actions
   // Sent to a team that reconnects after a page refresh
   setRejoined: ({ team_id, session, teams, phase, question, total_questions }) =>
@@ -60,7 +66,7 @@ export const useGameStore = create((set, get) => ({
     }),
 
   // Sent to host on connect — syncs current server state
-  setStateSync: ({ phase, session, teams, total_questions }) =>
+  setStateSync: ({ phase, session, teams, total_questions, questions, current_index }) =>
     set({
       phase: phase === 'lobby' ? 'lobby'
            : phase === 'question' ? 'question'
@@ -71,6 +77,8 @@ export const useGameStore = create((set, get) => ({
       sessionName: session?.name ?? null,
       teams: teams ?? [],
       totalQuestions: total_questions ?? 0,
+      questionsQueue: questions ?? [],
+      currentIndex: current_index ?? 0,
     }),
 
   setJoined: ({ team_id, session, teams }) =>
@@ -94,12 +102,22 @@ export const useGameStore = create((set, get) => ({
     set({
       phase: 'question',
       question: q,
+      currentIndex: q?.index ?? 0,
       reveal: null,
       teamResult: null,
       answeredCount: 0,
       answeredTeams: [],
       pendingMarks: 0,
     }),
+
+  // Host extended the current question — push the new time limit into the
+  // active question so the Countdown component picks it up.
+  extendQuestionTime: ({ new_time_limit_seconds }) =>
+    set((s) => ({
+      question: s.question
+        ? { ...s.question, time_limit_seconds: new_time_limit_seconds }
+        : null,
+    })),
 
   setQuestionClosed: () =>
     set({ phase: 'reveal' }),
