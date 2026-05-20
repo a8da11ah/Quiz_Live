@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useGameStore } from '../stores/game.store.js'
 import { useWsStore } from '../stores/ws.store.js'
+import { useToastStore } from '../stores/toast.store.js'
 
 const WS_BASE = import.meta.env.VITE_WS_URL || `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`
 
@@ -80,9 +81,12 @@ export function useWebSocket(sessionCode, role, token = null) {
       case 'team.kicked':
         game.setKicked()
         break
-      case 'error':
-        console.warn('[WS] server error:', msg.payload)
+      case 'error': {
+        const errMsg = msg.payload?.message || String(msg.payload)
+        console.warn('[WS] server error:', errMsg)
+        useToastStore.getState().error(errMsg)
         break
+      }
       default:
         console.debug('[WS] unknown message type:', msg.type)
     }

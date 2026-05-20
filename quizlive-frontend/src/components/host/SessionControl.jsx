@@ -56,9 +56,27 @@ export default function SessionControl({ sessionId, onForceNext }) {
       {/* Buttons */}
       <div className="flex flex-col gap-2">
         {phase === 'lobby' && (
-          <Button size="lg" icon={Play} onClick={() => send?.('host.launch')} className="w-full">
-            Launch Game
-          </Button>
+          <>
+            <Button
+              size="lg"
+              icon={Play}
+              onClick={() => send?.('host.launch')}
+              disabled={teams.length === 0 || !send}
+              className="w-full"
+            >
+              Launch Game
+            </Button>
+            {teams.length === 0 && (
+              <p className="text-xs text-gray-500 text-center mt-1">
+                Waiting for at least one team to join…
+              </p>
+            )}
+            {teams.length > 0 && !send && (
+              <p className="text-xs text-yellow-500 text-center mt-1">
+                Connecting to live channel…
+              </p>
+            )}
+          </>
         )}
 
         {(phase === 'reveal' || phase === 'leaderboard') && (
