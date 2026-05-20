@@ -1,8 +1,10 @@
 import { motion } from 'framer-motion'
 import { Users, Wifi } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../stores/game.store.js'
 
 export default function LobbyWait() {
+  const { t } = useTranslation()
   const sessionName = useGameStore((s) => s.sessionName)
   const teams       = useGameStore((s) => s.teams)
   const teamName    = useGameStore((s) => s.teamName)
@@ -28,21 +30,23 @@ export default function LobbyWait() {
 
       <div>
         <h2 className="text-xl font-bold text-white">{sessionName}</h2>
-        <p className="text-gray-400 mt-1">Waiting for the host to start…</p>
+        <p className="text-gray-400 mt-1">{t('join.waitingForHost')}</p>
       </div>
 
       <div className="w-full max-w-xs bg-gray-900 rounded-2xl border border-gray-800 p-4">
         <div className="flex items-center gap-2 mb-3">
           <Users size={14} className="text-gray-400" />
-          <span className="text-sm text-gray-400">{teams.length} team{teams.length !== 1 ? 's' : ''} in lobby</span>
+          <span className="text-sm text-gray-400">
+            {t('join.teamsInLobby', { count: teams.length })}
+          </span>
         </div>
         <div className="flex flex-col gap-2">
-          {teams.map((t) => (
-            <div key={t.id} className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm
-              ${t.name === teamName ? 'bg-brand-900/40 border border-brand-700' : 'bg-gray-800'}`}>
-              <span>{t.avatar_emoji || t.avatar}</span>
-              <span className="text-white font-medium">{t.name}</span>
-              {t.name === teamName && <span className="ml-auto text-xs text-brand-400">You</span>}
+          {teams.map((team) => (
+            <div key={team.id} className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm
+              ${team.name === teamName ? 'bg-brand-900/40 border border-brand-700' : 'bg-gray-800'}`}>
+              <span>{team.avatar_emoji || team.avatar}</span>
+              <span className="text-white font-medium">{team.name}</span>
+              {team.name === teamName && <span className="ms-auto text-xs text-brand-400">{t('common.you')}</span>}
             </div>
           ))}
         </div>

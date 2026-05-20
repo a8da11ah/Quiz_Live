@@ -49,6 +49,13 @@ export const useGameStore = create((set, get) => ({
   // Host-only: index of currently-running (or last-shown) question
   currentIndex: 0,
 
+  // Host-only: when true, leaderboard updates are not broadcast to teams
+  leaderboardLocked: false,
+
+  // Host-only quick-stats — fastest answers seen this game
+  fastestAnswer: null,   // { team_name, time_taken_ms, q_index }
+  slowestAnswer: null,
+
   // Actions
   // Sent to a team that reconnects after a page refresh
   setRejoined: ({ team_id, session, teams, phase, question, total_questions }) =>
@@ -66,7 +73,7 @@ export const useGameStore = create((set, get) => ({
     }),
 
   // Sent to host on connect — syncs current server state
-  setStateSync: ({ phase, session, teams, total_questions, questions, current_index }) =>
+  setStateSync: ({ phase, session, teams, total_questions, questions, current_index, lock_leaderboard }) =>
     set({
       phase: phase === 'lobby' ? 'lobby'
            : phase === 'question' ? 'question'
@@ -79,6 +86,7 @@ export const useGameStore = create((set, get) => ({
       totalQuestions: total_questions ?? 0,
       questionsQueue: questions ?? [],
       currentIndex: current_index ?? 0,
+      leaderboardLocked: !!lock_leaderboard,
     }),
 
   setJoined: ({ team_id, session, teams }) =>
@@ -136,10 +144,22 @@ export const useGameStore = create((set, get) => ({
     })),
 
   recordAnswerReceived: (data) =>
-    set((s) => ({
-      answeredCount: s.answeredCount + 1,
-      answeredTeams: [...s.answeredTeams, data],
-    })),
+    set((s) => {
+      // Update fastest/slowest tallies on the host side
+      const t = data.time_taken_ms
+      const stamped = { ...data, q_index: s.question?.index ?? 0 }
+      const fastest = !s.fastestAnswer || t < s.fastestAnswer.time_taken_ms ? stamped : s.fastestAnswer
+      const slowest = !s.slowestAnswer || t > s.slowestAnswer.time_taken_ms ? stamped : s.slowestAnswer
+      return {
+        answeredCount: s.answeredCount + 1,
+        answeredTeams: [...s.answeredTeams, data],
+        fastestAnswer: fastest,
+        slowestAnswer: slowest,
+      }
+    }),
+
+  setLeaderboardLocked: (locked) =>
+    set({ leaderboardLocked: locked }),
 
   setPaused: () =>
     set((s) => ({ phase: 'paused', pausedFrom: s.phase })),

@@ -2,6 +2,10 @@ import { useEffect, useRef, useCallback } from 'react'
 import { useGameStore } from '../stores/game.store.js'
 import { useWsStore } from '../stores/ws.store.js'
 import { useToastStore } from '../stores/toast.store.js'
+import {
+  playTeamJoin, playQuestion, playReveal,
+  playCorrect, playIncorrect, playPause, playResume, playFinished,
+} from '../lib/sounds.js'
 
 const WS_BASE = import.meta.env.VITE_WS_URL || `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/ws`
 
@@ -44,6 +48,7 @@ export function useWebSocket(sessionCode, role, token = null) {
         break
       case 'team.connected':
         game.addTeam(msg.payload.team)
+        playTeamJoin()
         break
       case 'team.disconnected':
         game.removeTeam(msg.payload.team_id)
@@ -53,18 +58,22 @@ export function useWebSocket(sessionCode, role, token = null) {
         break
       case 'question.started':
         game.setQuestion(msg.payload)
+        playQuestion()
         break
       case 'question.closed':
         game.setQuestionClosed()
         break
       case 'question.revealed':
         game.setReveal(msg.payload)
+        playReveal()
         break
       case 'answer.received':
         game.recordAnswerReceived(msg.payload)
         break
       case 'team.result':
         game.setTeamResult(msg.payload)
+        if      (msg.payload.result === 'correct')   playCorrect()
+        else if (msg.payload.result === 'incorrect') playIncorrect()
         break
       case 'leaderboard.updated':
         game.setLeaderboard(msg.payload)
@@ -79,14 +88,20 @@ export function useWebSocket(sessionCode, role, token = null) {
           `Score adjusted: ${msg.payload.delta > 0 ? '+' : ''}${msg.payload.delta}`,
         )
         break
+      case 'leaderboard.lock':
+        game.setLeaderboardLocked(!!msg.payload.locked)
+        break
       case 'game.paused':
         game.setPaused()
+        playPause()
         break
       case 'game.resumed':
         game.setResumed(msg.payload || {})
+        playResume()
         break
       case 'game.finished':
         game.setFinished(msg.payload)
+        playFinished()
         break
       case 'team.kicked':
         game.setKicked()

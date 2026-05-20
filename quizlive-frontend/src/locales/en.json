@@ -1,0 +1,164 @@
+{
+  "app": {
+    "name": "QuizLive",
+    "languageEnglish": "English",
+    "languageArabic": "العربية"
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "loading": "Loading…",
+    "search": "Search…",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "advanceAnyway": "Advance Anyway",
+    "you": "You",
+    "yes": "Yes",
+    "no": "No",
+    "close": "Close",
+    "confirm": "Confirm"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signingIn": "Signing in…",
+    "signOut": "Sign out",
+    "username": "Username",
+    "password": "Password",
+    "invalidCredentials": "Invalid username or password"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "questions": "Questions",
+    "categories": "Categories",
+    "sessions": "Sessions"
+  },
+  "sessions": {
+    "title": "Sessions",
+    "new": "New Session",
+    "sessionName": "Session Name",
+    "sessionNamePlaceholder": "e.g. Friday Night Quiz",
+    "scoringMode": "Scoring Mode",
+    "questionsLabel": "Questions",
+    "questionsSelected": "{{count}} selected",
+    "nameRequired": "Session name is required.",
+    "atLeastOneQuestion": "Select at least one question.",
+    "createSession": "Create Session",
+    "openLobby": "Open Lobby",
+    "projectorView": "Projector View",
+    "sessionComplete": "Session complete!",
+    "noQuestionsLibrary": "No questions in library yet.",
+    "noQuestionsMatch": "No questions match your filter.",
+    "allCategories": "All categories",
+    "selectedOrder": "Selected (drag to reorder)",
+    "addedToSession": "Added to session",
+    "lobbyHint": "Click <strong>Open Lobby</strong> to generate the session code and start accepting teams.",
+    "status": {
+      "draft": "Draft",
+      "lobby": "Lobby",
+      "active": "Active",
+      "paused": "Paused",
+      "finished": "Finished",
+      "cancelled": "Cancelled"
+    }
+  },
+  "scoring": {
+    "standard":         { "label": "Standard",     "desc": "Fixed points per correct answer" },
+    "speed_bonus":      { "label": "Speed Bonus",  "desc": "Extra points for answering fast" },
+    "streak":           { "label": "Streak",       "desc": "Multiplier for consecutive correct answers" },
+    "elimination":      { "label": "Elimination",  "desc": "Wrong answer = team eliminated" }
+  },
+  "control": {
+    "title": "Game Control",
+    "launch": "Launch Game",
+    "next": "Next Question",
+    "nextUnmarked": "Next ({{count}} unmarked)",
+    "pause": "Pause",
+    "resume": "Resume",
+    "end": "End Session",
+    "extend": "+{{seconds}}s",
+    "skip": "Skip Question",
+    "replay": "Replay Question",
+    "waitingForTeams": "Waiting for at least one team to join…",
+    "connecting": "Connecting to live channel…",
+    "qOf": "Q{{n}} of {{total}}",
+    "answeredOf": "{{answered}}/{{total}} answered",
+    "needsMarking": "{{count}} answer needs marking",
+    "needsMarking_plural": "{{count}} answers need marking",
+    "unmarkedConfirm": "There are {{count}} open-text answers that haven't been marked yet. Advancing will leave them as <em>pending</em> (0 points).",
+    "unmarkedTitle": "Unmarked answers",
+    "lockLeaderboard": "Hide leaderboard from teams",
+    "leaderboardHidden": "Leaderboard hidden",
+    "leaderboardVisible": "Leaderboard visible"
+  },
+  "teamList": {
+    "connected": "{{count}} team connected",
+    "connected_plural": "{{count}} teams connected",
+    "waiting": "Waiting for teams to join…",
+    "kick": "Kick team",
+    "minusTen": "−10 pts",
+    "plusTen": "+10 pts",
+    "pts": "{{n}} pts"
+  },
+  "queue": {
+    "title": "Question Queue",
+    "total": "{{count}} total",
+    "none": "No questions loaded"
+  },
+  "stats": {
+    "title": "Quick Stats",
+    "fastest": "Fastest answer",
+    "slowest": "Slowest answer",
+    "avgScore": "Avg. score",
+    "noData": "No data yet — start a question first."
+  },
+  "join": {
+    "title": "Join Session",
+    "teamName": "Team name",
+    "teamNamePlaceholder": "e.g. The Avengers",
+    "playerNames": "Player names",
+    "playerNamePlaceholder": "Player {{n}}",
+    "addPlayer": "Add player",
+    "removePlayer": "Remove",
+    "pickColor": "Pick a color",
+    "pickAvatar": "Pick an avatar",
+    "joinNow": "Join now",
+    "joining": "Joining…",
+    "cantJoin": "Can't join",
+    "scanInstructions": "Scan the QR code or go to <strong>{{host}}/join/{{code}}</strong>",
+    "teamsInLobby": "{{count}} team in lobby",
+    "teamsInLobby_plural": "{{count}} teams in lobby",
+    "waitingForHost": "Waiting for the host to start…"
+  },
+  "play": {
+    "submit": "Submit",
+    "submitted": "Answer submitted",
+    "timeUp": "Time's up!",
+    "correctAnswer": "Correct answer",
+    "yourAnswer": "Your answer",
+    "result": {
+      "correct": "Correct!",
+      "incorrect": "Incorrect",
+      "partial": "Partially correct",
+      "noAnswer": "No answer submitted",
+      "pending": "Pending review"
+    },
+    "score": "Score",
+    "points": "{{n}} pts",
+    "youGotPoints": "You got {{n}} points",
+    "rankNow": "You're now #{{rank}}",
+    "gamePaused": "Game Paused",
+    "waitingResume": "Waiting for the host to resume…",
+    "removed": "You were removed from the session",
+    "removedDesc": "The host removed your team.",
+    "gameOver": "Game Over!",
+    "wins": "{{name}} wins!"
+  },
+  "errors": {
+    "requestFailed": "Request failed",
+    "sessionNotFound": "Session not found",
+    "noTeamsJoined": "No teams have joined yet"
+  }
+}

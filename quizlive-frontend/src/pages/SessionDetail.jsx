@@ -9,6 +9,7 @@ import { useWsStore }   from '../stores/ws.store.js'
 import { startSession } from '../lib/api.js'
 import SessionControl from '../components/host/SessionControl.jsx'
 import QuestionQueue  from '../components/host/QuestionQueue.jsx'
+import QuickStats     from '../components/host/QuickStats.jsx'
 import TeamList       from '../components/host/TeamList.jsx'
 import Leaderboard    from '../components/common/Leaderboard.jsx'
 import QRCode         from '../components/common/QRCode.jsx'
@@ -134,8 +135,8 @@ export default function SessionDetail() {
           )}
         </div>
 
-        {/* Right: Leaderboard */}
-        <div className="col-span-1">
+        {/* Right: Leaderboard + Quick Stats */}
+        <div className="col-span-1 flex flex-col gap-4">
           <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
             <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3">Leaderboard</h3>
             {leaderboard.length ? (
@@ -144,6 +145,7 @@ export default function SessionDetail() {
               <p className="text-gray-600 text-sm text-center py-6">No scores yet</p>
             )}
           </div>
+          <QuickStats />
         </div>
       </div>
 

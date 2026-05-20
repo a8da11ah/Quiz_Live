@@ -1,0 +1,164 @@
+{
+  "app": {
+    "name": "كويز لايف",
+    "languageEnglish": "English",
+    "languageArabic": "العربية"
+  },
+  "common": {
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "back": "رجوع",
+    "loading": "جاري التحميل…",
+    "search": "بحث…",
+    "selectAll": "تحديد الكل",
+    "deselectAll": "إلغاء تحديد الكل",
+    "advanceAnyway": "المتابعة على أي حال",
+    "you": "أنت",
+    "yes": "نعم",
+    "no": "لا",
+    "close": "إغلاق",
+    "confirm": "تأكيد"
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signingIn": "جاري تسجيل الدخول…",
+    "signOut": "تسجيل الخروج",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "invalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة"
+  },
+  "nav": {
+    "dashboard": "اللوحة الرئيسية",
+    "questions": "الأسئلة",
+    "categories": "الفئات",
+    "sessions": "الجلسات"
+  },
+  "sessions": {
+    "title": "الجلسات",
+    "new": "جلسة جديدة",
+    "sessionName": "اسم الجلسة",
+    "sessionNamePlaceholder": "مثال: كويز ليلة الجمعة",
+    "scoringMode": "نظام التسجيل",
+    "questionsLabel": "الأسئلة",
+    "questionsSelected": "تم اختيار {{count}}",
+    "nameRequired": "اسم الجلسة مطلوب.",
+    "atLeastOneQuestion": "اختر سؤالاً واحداً على الأقل.",
+    "createSession": "إنشاء الجلسة",
+    "openLobby": "فتح الانتظار",
+    "projectorView": "شاشة العرض",
+    "sessionComplete": "اكتملت الجلسة!",
+    "noQuestionsLibrary": "لا توجد أسئلة في المكتبة بعد.",
+    "noQuestionsMatch": "لا توجد أسئلة تطابق التصفية.",
+    "allCategories": "كل الفئات",
+    "selectedOrder": "المختار (اسحب لإعادة الترتيب)",
+    "addedToSession": "تمت الإضافة للجلسة",
+    "lobbyHint": "اضغط على <strong>فتح الانتظار</strong> لتوليد رمز الجلسة والبدء في قبول الفرق.",
+    "status": {
+      "draft": "مسودة",
+      "lobby": "انتظار",
+      "active": "نشطة",
+      "paused": "متوقفة",
+      "finished": "منتهية",
+      "cancelled": "ملغاة"
+    }
+  },
+  "scoring": {
+    "standard":         { "label": "قياسي",        "desc": "نقاط ثابتة لكل إجابة صحيحة" },
+    "speed_bonus":      { "label": "مكافأة سرعة",  "desc": "نقاط إضافية للإجابة السريعة" },
+    "streak":           { "label": "سلسلة",        "desc": "مضاعف للإجابات الصحيحة المتتالية" },
+    "elimination":      { "label": "إقصاء",        "desc": "إجابة خاطئة = إقصاء الفريق" }
+  },
+  "control": {
+    "title": "التحكم في اللعبة",
+    "launch": "ابدأ اللعبة",
+    "next": "السؤال التالي",
+    "nextUnmarked": "التالي ({{count}} غير مصححة)",
+    "pause": "إيقاف مؤقت",
+    "resume": "استئناف",
+    "end": "إنهاء الجلسة",
+    "extend": "+{{seconds}}ث",
+    "skip": "تخطي السؤال",
+    "replay": "إعادة السؤال",
+    "waitingForTeams": "في انتظار انضمام فريق واحد على الأقل…",
+    "connecting": "جاري الاتصال بالقناة المباشرة…",
+    "qOf": "س{{n}} من {{total}}",
+    "answeredOf": "{{answered}}/{{total}} أجابوا",
+    "needsMarking": "{{count}} إجابة تحتاج تصحيح",
+    "needsMarking_plural": "{{count}} إجابات تحتاج تصحيح",
+    "unmarkedConfirm": "هناك {{count}} إجابات نصية لم يتم تصحيحها بعد. المتابعة ستتركها <em>معلقة</em> (٠ نقطة).",
+    "unmarkedTitle": "إجابات بدون تصحيح",
+    "lockLeaderboard": "إخفاء قائمة المتصدرين عن الفرق",
+    "leaderboardHidden": "قائمة المتصدرين مخفية",
+    "leaderboardVisible": "قائمة المتصدرين ظاهرة"
+  },
+  "teamList": {
+    "connected": "فريق واحد متصل",
+    "connected_plural": "{{count}} فرق متصلة",
+    "waiting": "في انتظار انضمام الفرق…",
+    "kick": "إخراج الفريق",
+    "minusTen": "−١٠ نقاط",
+    "plusTen": "+١٠ نقاط",
+    "pts": "{{n}} نقطة"
+  },
+  "queue": {
+    "title": "قائمة الأسئلة",
+    "total": "المجموع {{count}}",
+    "none": "لم يتم تحميل أي أسئلة"
+  },
+  "stats": {
+    "title": "إحصائيات سريعة",
+    "fastest": "أسرع إجابة",
+    "slowest": "أبطأ إجابة",
+    "avgScore": "متوسط النقاط",
+    "noData": "لا توجد بيانات بعد — ابدأ سؤالاً أولاً."
+  },
+  "join": {
+    "title": "الانضمام للجلسة",
+    "teamName": "اسم الفريق",
+    "teamNamePlaceholder": "مثال: المنتقمون",
+    "playerNames": "أسماء اللاعبين",
+    "playerNamePlaceholder": "لاعب {{n}}",
+    "addPlayer": "إضافة لاعب",
+    "removePlayer": "إزالة",
+    "pickColor": "اختر لوناً",
+    "pickAvatar": "اختر شخصية",
+    "joinNow": "انضم الآن",
+    "joining": "جاري الانضمام…",
+    "cantJoin": "لا يمكن الانضمام",
+    "scanInstructions": "امسح رمز QR أو اذهب إلى <strong>{{host}}/join/{{code}}</strong>",
+    "teamsInLobby": "فريق واحد في غرفة الانتظار",
+    "teamsInLobby_plural": "{{count}} فرق في غرفة الانتظار",
+    "waitingForHost": "في انتظار المضيف لبدء اللعبة…"
+  },
+  "play": {
+    "submit": "إرسال",
+    "submitted": "تم إرسال الإجابة",
+    "timeUp": "انتهى الوقت!",
+    "correctAnswer": "الإجابة الصحيحة",
+    "yourAnswer": "إجابتك",
+    "result": {
+      "correct": "صحيح!",
+      "incorrect": "خطأ",
+      "partial": "صحيح جزئياً",
+      "noAnswer": "لم يتم إرسال إجابة",
+      "pending": "بانتظار المراجعة"
+    },
+    "score": "النتيجة",
+    "points": "{{n}} نقطة",
+    "youGotPoints": "حصلت على {{n}} نقطة",
+    "rankNow": "ترتيبك الآن #{{rank}}",
+    "gamePaused": "اللعبة متوقفة",
+    "waitingResume": "في انتظار المضيف لاستئناف اللعبة…",
+    "removed": "تم إخراجك من الجلسة",
+    "removedDesc": "قام المضيف بإزالة فريقك.",
+    "gameOver": "انتهت اللعبة!",
+    "wins": "{{name}} الفائز!"
+  },
+  "errors": {
+    "requestFailed": "فشل الطلب",
+    "sessionNotFound": "الجلسة غير موجودة",
+    "noTeamsJoined": "لم ينضم أي فريق بعد"
+  }
+}

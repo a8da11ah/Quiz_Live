@@ -1,4 +1,5 @@
 import { Check, Circle, Dot, ListOrdered } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../../stores/game.store.js'
 
 const TYPE_LABEL = {
@@ -11,6 +12,7 @@ const TYPE_LABEL = {
 }
 
 export default function QuestionQueue() {
+  const { t }        = useTranslation()
   const queue        = useGameStore((s) => s.questionsQueue)
   const currentIndex = useGameStore((s) => s.currentIndex)
   const phase        = useGameStore((s) => s.phase)
@@ -19,9 +21,9 @@ export default function QuestionQueue() {
     return (
       <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
         <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-          <ListOrdered size={14} /> Question Queue
+          <ListOrdered size={14} /> {t('queue.title')}
         </h3>
-        <p className="text-center text-gray-600 py-6 text-sm">No questions loaded</p>
+        <p className="text-center text-gray-600 py-6 text-sm">{t('queue.none')}</p>
       </div>
     )
   }
@@ -31,9 +33,9 @@ export default function QuestionQueue() {
   return (
     <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
       <h3 className="text-sm font-medium text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-        <ListOrdered size={14} /> Question Queue
-        <span className="ml-auto text-xs text-gray-500 normal-case tracking-normal">
-          {queue.length} total
+        <ListOrdered size={14} /> {t('queue.title')}
+        <span className="ms-auto text-xs text-gray-500 normal-case tracking-normal">
+          {t('queue.total', { count: queue.length })}
         </span>
       </h3>
 

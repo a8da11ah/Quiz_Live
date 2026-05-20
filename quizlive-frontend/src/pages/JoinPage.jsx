@@ -1,11 +1,15 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { Zap, AlertCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { joinInfo } from '../lib/api.js'
 import JoinForm from '../components/team/JoinForm.jsx'
+import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
+import SoundToggle      from '../components/common/SoundToggle.jsx'
 import { useGameStore } from '../stores/game.store.js'
 
 export default function JoinPage() {
+  const { t } = useTranslation()
   const { code } = useParams()
   const navigate = useNavigate()
   const [info, setInfo] = useState(null)
@@ -34,8 +38,9 @@ export default function JoinPage() {
       <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
         <div className="text-center flex flex-col items-center gap-3">
           <AlertCircle size={40} className="text-red-400" />
-          <p className="text-white font-semibold text-xl">Can't join</p>
+          <p className="text-white font-semibold text-xl">{t('join.cantJoin')}</p>
           <p className="text-gray-400">{infoError}</p>
+          <LanguageSwitcher className="mt-4" />
         </div>
       </div>
     )
@@ -56,7 +61,11 @@ export default function JoinPage() {
           <div className="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center">
             <Zap size={16} className="text-white" />
           </div>
-          <span className="font-bold text-white">QuizLive</span>
+          <span className="font-bold text-white">{t('app.name')}</span>
+          <div className="ms-auto flex items-center gap-1.5">
+            <LanguageSwitcher />
+            <SoundToggle />
+          </div>
         </div>
 
         <div className="glass rounded-2xl p-6">

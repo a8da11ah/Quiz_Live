@@ -60,6 +60,10 @@ type Room struct {
 	timer             *time.Timer
 	pausedRemaining   time.Duration
 	isPaused          bool
+
+	// Host setting — when true, leaderboard.updated broadcasts only go to the
+	// host, not teams.  Teams still see their own team.result.
+	lockLeaderboard bool
 }
 
 func newRoom(code string, hub *Hub) *Room {
@@ -145,6 +149,7 @@ func (r *Room) RegisterHost(c *Client) {
 	phase := string(r.phase)
 	totalQ := len(r.questions)
 	curQ := r.currentQ
+	locked := r.lockLeaderboard
 
 	// Queue: lightweight per-question metadata (host-only, no answer keys).
 	queue := make([]map[string]any, len(r.questions))
@@ -161,14 +166,34 @@ func (r *Room) RegisterHost(c *Client) {
 
 	if sess != nil {
 		c.SendMsg("state.sync", map[string]any{
-			"phase":           phase,
-			"session":         sess,
-			"teams":           teams,
-			"total_questions": totalQ,
-			"current_index":   curQ,
-			"questions":       queue,
+			"phase":            phase,
+			"session":          sess,
+			"teams":            teams,
+			"total_questions":  totalQ,
+			"current_index":    curQ,
+			"questions":        queue,
+			"lock_leaderboard": locked,
 		})
 	}
+}
+
+// broadcastLeaderboardLocked sends leaderboard.updated to the host only when
+// lockLeaderboard is true; otherwise everyone gets it.  Must be called with
+// r.mu held.
+func (r *Room) broadcastLeaderboardLocked(rankings []map[string]any) {
+	payload := map[string]any{"rankings": rankings}
+	if r.lockLeaderboard {
+		// Host-only delivery
+		if r.host != nil {
+			data := mustMarshal(OutMessage{Type: "leaderboard.updated", Payload: payload})
+			select {
+			case r.host.Send <- data:
+			default:
+			}
+		}
+		return
+	}
+	r.broadcastLocked("leaderboard.updated", payload)
 }
 
 // Unregister removes a client from the room.
@@ -249,6 +274,17 @@ func (r *Room) handleHostMessage(c *Client, msg InMessage) {
 			return
 		}
 		r.handleAdjustScore(c, p.TeamID, p.Delta)
+	case "host.replay_question":
+		r.handleReplayQuestion(c)
+	case "host.lock_leaderboard":
+		var p struct {
+			Locked bool `json:"locked"`
+		}
+		if err := json.Unmarshal(msg.Payload, &p); err != nil {
+			c.SendError("invalid lock_leaderboard payload")
+			return
+		}
+		r.handleLockLeaderboard(p.Locked)
 	default:
 		c.SendError("unknown message type: " + msg.Type)
 	}
@@ -591,6 +627,48 @@ func (r *Room) handleExtendTime(c *Client, seconds int) {
 	})
 }
 
+// handleReplayQuestion resets answers for the active question and restarts the
+// question (broadcast question.started again).  Useful if a network glitch
+// caused most teams to miss answering.
+func (r *Room) handleReplayQuestion(c *Client) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	// Allow replay during question OR reveal/leaderboard (re-run the just-closed Q).
+	if r.phase != phaseQuestion && r.phase != phaseReveal && r.phase != phaseLeaderboard {
+		c.SendError("nothing to replay")
+		return
+	}
+
+	// Roll back any score deltas the answers awarded? We chose NOT to — the
+	// host can use ±10 buttons to fix individual scores.  Replay just opens a
+	// fresh answer window for the same question.
+	r.phase = phaseQuestion
+	r.answers = make(map[uuid.UUID]submittedAnswer)
+	if r.timer != nil {
+		r.timer.Stop()
+		r.timer = nil
+	}
+	r.isPaused = false
+	r.startQuestionLocked()
+}
+
+// handleLockLeaderboard toggles whether team-side clients receive
+// leaderboard.updated broadcasts.  Host always receives them.
+func (r *Room) handleLockLeaderboard(locked bool) {
+	r.mu.Lock()
+	r.lockLeaderboard = locked
+	r.mu.Unlock()
+
+	// Tell the host the new state so its UI can reflect it.
+	r.mu.Lock()
+	host := r.host
+	r.mu.Unlock()
+	if host != nil {
+		host.SendMsg("leaderboard.lock", map[string]any{"locked": locked})
+	}
+}
+
 // handleAdjustScore lets the host nudge a team's score by `delta` (positive or
 // negative). Persists to DB, updates in-memory team, broadcasts an updated
 // leaderboard so every client refreshes.
@@ -623,9 +701,10 @@ func (r *Room) handleAdjustScore(c *Client, teamID uuid.UUID, delta int) {
 		"delta":     delta,
 		"new_score": team.Score,
 	})
-	r.broadcastLocked("leaderboard.updated", map[string]any{
-		"rankings": rankings,
-	})
+
+	r.mu.Lock()
+	r.broadcastLeaderboardLocked(rankings)
+	r.mu.Unlock()
 }
 
 func (r *Room) handleKick(teamID uuid.UUID) {
@@ -749,9 +828,7 @@ func (r *Room) closeQuestionLocked() {
 	})
 
 	rankings := r.buildRankings()
-	r.broadcastLocked("leaderboard.updated", map[string]any{
-		"rankings": rankings,
-	})
+	r.broadcastLeaderboardLocked(rankings)
 
 	r.phase = phaseLeaderboard
 }

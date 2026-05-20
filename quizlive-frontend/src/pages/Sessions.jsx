@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Plus, Play, Calendar } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { getSessions } from '../lib/api.js'
 import Button from '../components/common/Button.jsx'
 import { StatusBadge } from '../components/common/Badge.jsx'
 import Layout from '../components/common/Layout.jsx'
 
 export default function Sessions() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [sessions, setSessions] = useState([])
   const [loading,  setLoading]  = useState(true)
@@ -21,18 +23,18 @@ export default function Sessions() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Play className="text-brand-400" size={22} />
-            <h1 className="text-2xl font-bold text-white">Sessions</h1>
+            <h1 className="text-2xl font-bold text-white">{t('sessions.title')}</h1>
           </div>
-          <Button icon={Plus} onClick={() => navigate('/sessions/new')}>New Session</Button>
+          <Button icon={Plus} onClick={() => navigate('/sessions/new')}>{t('sessions.new')}</Button>
         </div>
 
         {loading ? (
-          <div className="text-center py-12 text-gray-500">Loading…</div>
+          <div className="text-center py-12 text-gray-500">{t('common.loading')}</div>
         ) : sessions.length === 0 ? (
           <div className="text-center py-16 border border-dashed border-gray-800 rounded-2xl">
             <Play size={40} className="text-gray-700 mx-auto mb-3" />
-            <p className="text-gray-500 mb-3">No sessions yet</p>
-            <Button icon={Plus} size="sm" onClick={() => navigate('/sessions/new')}>Create a session</Button>
+            <p className="text-gray-500 mb-3">—</p>
+            <Button icon={Plus} size="sm" onClick={() => navigate('/sessions/new')}>{t('sessions.new')}</Button>
           </div>
         ) : (
           <div className="flex flex-col gap-2">

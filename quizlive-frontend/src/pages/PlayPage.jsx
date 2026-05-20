@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useGameStore } from '../stores/game.store.js'
 import { useWsStore }   from '../stores/ws.store.js'
 import { useWebSocket } from '../hooks/useWebSocket.js'
@@ -8,10 +9,12 @@ import QuestionView from '../components/team/QuestionView.jsx'
 import ResultView   from '../components/team/ResultView.jsx'
 import FinalScreen  from '../components/team/FinalScreen.jsx'
 import Leaderboard  from '../components/common/Leaderboard.jsx'
-import { useState } from 'react'
+import LanguageSwitcher from '../components/common/LanguageSwitcher.jsx'
+import SoundToggle      from '../components/common/SoundToggle.jsx'
 import { Wifi, WifiOff } from 'lucide-react'
 
 export default function PlayPage() {
+  const { t } = useTranslation()
   const { code }   = useParams()
   const navigate   = useNavigate()
   const phase      = useGameStore((s) => s.phase)
@@ -54,8 +57,8 @@ export default function PlayPage() {
       <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4 text-center">
         <div>
           <p className="text-4xl mb-3">😔</p>
-          <p className="text-white text-xl font-bold">You were removed from the session</p>
-          <p className="text-gray-400 mt-1">The host removed your team.</p>
+          <p className="text-white text-xl font-bold">{t('play.removed')}</p>
+          <p className="text-gray-400 mt-1">{t('play.removedDesc')}</p>
         </div>
       </div>
     )
@@ -69,11 +72,15 @@ export default function PlayPage() {
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col">
       {/* Status bar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-800">
+      <div className="flex items-center justify-between px-4 py-2 bg-gray-900 border-b border-gray-800 gap-3">
         <span className="text-xs text-gray-500 font-mono">{code}</span>
-        <div className={`flex items-center gap-1 text-xs ${wsStatus === 'connected' ? 'text-emerald-400' : 'text-red-400'}`}>
-          {wsStatus === 'connected' ? <Wifi size={12} /> : <WifiOff size={12} />}
-          {wsStatus}
+        <div className="flex items-center gap-2 ms-auto">
+          <LanguageSwitcher />
+          <SoundToggle />
+          <div className={`flex items-center gap-1 text-xs ${wsStatus === 'connected' ? 'text-emerald-400' : 'text-red-400'}`}>
+            {wsStatus === 'connected' ? <Wifi size={12} /> : <WifiOff size={12} />}
+            {wsStatus}
+          </div>
         </div>
       </div>
 
@@ -105,8 +112,8 @@ export default function PlayPage() {
         {phase === 'paused' && (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <p className="text-4xl">⏸</p>
-            <p className="text-white font-semibold text-lg">Game Paused</p>
-            <p className="text-gray-400 text-sm">Waiting for the host to resume…</p>
+            <p className="text-white font-semibold text-lg">{t('play.gamePaused')}</p>
+            <p className="text-gray-400 text-sm">{t('play.waitingResume')}</p>
           </div>
         )}
 
