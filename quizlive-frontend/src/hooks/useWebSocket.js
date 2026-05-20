@@ -27,6 +27,19 @@ export function useWebSocket(sessionCode, role, token = null) {
         break
       case 'joined':
         game.setJoined(msg.payload)
+        // Persist team identity so a page refresh can reconnect via team.rejoin
+        if (sessionCode) {
+          sessionStorage.setItem(
+            `quizlive_team_${sessionCode}`,
+            JSON.stringify({
+              teamId: msg.payload.team_id,
+              teamName: useGameStore.getState().teamName,
+            }),
+          )
+        }
+        break
+      case 'rejoined':
+        game.setRejoined(msg.payload)
         break
       case 'team.connected':
         game.addTeam(msg.payload.team)
@@ -73,7 +86,7 @@ export function useWebSocket(sessionCode, role, token = null) {
       default:
         console.debug('[WS] unknown message type:', msg.type)
     }
-  }, [game])
+  }, [game, sessionCode])
 
   const connect = useCallback(() => {
     if (!sessionCode) return
@@ -93,12 +106,22 @@ export function useWebSocket(sessionCode, role, token = null) {
           ws.send(JSON.stringify({ type, payload }))
         }
       })
-      // Auto-send team.join if navigated from JoinPage (avoids a second WS connection)
+      // Auto-send the right join message for team connections.
       if (role === 'team') {
         const pending = sessionStorage.getItem('quizlive_join_payload')
         if (pending) {
+          // Fresh join: navigated from JoinPage
           ws.send(JSON.stringify({ type: 'team.join', payload: JSON.parse(pending) }))
           sessionStorage.removeItem('quizlive_join_payload')
+        } else {
+          // Possible reconnect after a page refresh — restore teamName first so
+          // the lobby "You" badge works, then tell the server to re-associate us.
+          const stored = sessionStorage.getItem(`quizlive_team_${sessionCode}`)
+          if (stored) {
+            const { teamId, teamName } = JSON.parse(stored)
+            if (teamName) useGameStore.setState({ teamName })
+            ws.send(JSON.stringify({ type: 'team.rejoin', payload: { team_id: teamId } }))
+          }
         }
       }
     }

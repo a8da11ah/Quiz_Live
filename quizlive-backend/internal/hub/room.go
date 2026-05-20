@@ -235,6 +235,16 @@ func (r *Room) handleTeamMessage(c *Client, msg InMessage) {
 		}
 		r.handleTeamJoin(c, p.TeamName, p.Players, p.Color, p.Avatar)
 
+	case "team.rejoin":
+		var p struct {
+			TeamID uuid.UUID `json:"team_id"`
+		}
+		if err := json.Unmarshal(msg.Payload, &p); err != nil || p.TeamID == uuid.Nil {
+			c.SendError("invalid team.rejoin payload")
+			return
+		}
+		r.handleTeamRejoin(c, p.TeamID)
+
 	case "answer.submit":
 		var p struct {
 			SessionQuestionID uuid.UUID       `json:"session_question_id"`
@@ -304,6 +314,85 @@ func (r *Room) handleTeamJoin(c *Client, teamName string, players []string, colo
 
 	r.broadcastExcept(c, "team.connected", map[string]any{"team": team})
 	slog.Info("team joined", "team", teamName, "session", r.code)
+}
+
+// handleTeamRejoin reconnects a returning team (e.g. after a page refresh).
+// It looks the team up in memory first, falls back to DB, then replaces any
+// stale connection and sends the client a full state snapshot.
+func (r *Room) handleTeamRejoin(c *Client, teamID uuid.UUID) {
+	// 1. Resolve team — check in-memory map first, fall back to DB.
+	r.mu.Lock()
+	team, inMem := r.dbTeams[teamID]
+	r.mu.Unlock()
+
+	if !inMem {
+		t, err := r.hub.teamStore.Get(context.Background(), teamID)
+		if err != nil {
+			slog.Warn("team.rejoin: team not found", "team_id", teamID)
+			c.SendError("team not found — session may have ended")
+			return
+		}
+		r.mu.Lock()
+		r.dbTeams[t.ID] = t
+		r.mu.Unlock()
+		team = t
+	}
+
+	// 2. Register client (close stale connection if any).
+	r.mu.Lock()
+	if old, exists := r.teams[teamID]; exists && old != c {
+		go old.Conn.Close()
+	}
+	c.TeamID = teamID
+	r.teams[teamID] = c
+
+	// 3. Capture state snapshot while holding the lock.
+	phase := string(r.phase)
+	sessName := ""
+	if r.sess != nil {
+		sessName = r.sess.Name
+	}
+	teamList := r.teamListLocked()
+	totalQ := len(r.questions)
+
+	var questionPayload map[string]any
+	if r.phase == phaseQuestion && r.currentQ < len(r.questions) {
+		qs := r.questions[r.currentQ]
+		q := qs.question
+		opts := make([]map[string]any, len(q.Options))
+		for i, o := range q.Options {
+			opts[i] = map[string]any{
+				"id": o.ID, "label": o.Label, "sort_order": o.SortOrder,
+			}
+		}
+		questionPayload = map[string]any{
+			"session_question_id": qs.sessionQuestionID,
+			"index":               r.currentQ,
+			"total":               len(r.questions),
+			"type":                q.Type,
+			"title":               q.Title,
+			"options":             opts,
+			"time_limit_seconds":  qs.timeLimitSeconds,
+			"points_value":        qs.pointsValue,
+			"started_at":          r.questionStartedAt.UTC().Format(time.RFC3339Nano),
+		}
+	}
+	r.mu.Unlock()
+
+	// 4. Send full state to the rejoining client.
+	payload := map[string]any{
+		"team_id":         teamID,
+		"session":         map[string]any{"name": sessName},
+		"teams":           teamList,
+		"phase":           phase,
+		"total_questions": totalQ,
+	}
+	if questionPayload != nil {
+		payload["question"] = questionPayload
+	}
+
+	c.SendMsg("rejoined", payload)
+	slog.Info("team rejoined", "team", team.Name, "session", r.code)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

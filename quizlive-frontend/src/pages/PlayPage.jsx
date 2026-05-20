@@ -27,18 +27,20 @@ export default function PlayPage() {
     setSubmitted(false)
   }, [question?.session_question_id])
 
-  // If user lands here without having joined (no teamId) and no pending join in
-  // sessionStorage, redirect back to the join page.
+  // If there is no teamId, no pending join, and no stored identity for this
+  // session, the user has no business being here — send them to JoinPage.
+  const hasPendingJoin   = !!sessionStorage.getItem('quizlive_join_payload')
+  const hasStoredTeam    = !!sessionStorage.getItem(`quizlive_team_${code}`)
+
   useEffect(() => {
-    if (!teamId && phase === 'idle' && !sessionStorage.getItem('quizlive_join_payload')) {
+    if (!teamId && phase === 'idle' && !hasPendingJoin && !hasStoredTeam) {
       navigate(`/join/${code}`, { replace: true })
     }
-  }, [teamId, phase, code, navigate])
+  }, [teamId, phase, code, navigate, hasPendingJoin, hasStoredTeam])
 
-  // Connect if we have a teamId (reconnect after refresh) OR a pending join payload
-  // (fresh join navigated from JoinPage).  useWebSocket reads and clears the
-  // sessionStorage entry on open and sends team.join automatically.
-  const shouldConnect = !!(teamId || sessionStorage.getItem('quizlive_join_payload'))
+  // Connect whenever we have *any* credential: active teamId, a fresh-join
+  // payload, or a stored identity from a previous join (page refresh).
+  const shouldConnect = !!(teamId || hasPendingJoin || hasStoredTeam)
   useWebSocket(shouldConnect ? code : null, 'team')
 
   // Handle kicked

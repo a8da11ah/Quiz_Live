@@ -44,6 +44,21 @@ export const useGameStore = create((set, get) => ({
   pendingMarks: 0,
 
   // Actions
+  // Sent to a team that reconnects after a page refresh
+  setRejoined: ({ team_id, session, teams, phase, question, total_questions }) =>
+    set({
+      phase: phase === 'question'    ? 'question'
+           : phase === 'reveal'      ? 'reveal'
+           : phase === 'leaderboard' ? 'leaderboard'
+           : phase === 'finished'    ? 'finished'
+           : 'lobby',
+      teamId: team_id,
+      sessionName: session?.name ?? null,
+      teams: teams ?? [],
+      question: question ?? null,
+      totalQuestions: total_questions ?? 0,
+    }),
+
   // Sent to host on connect — syncs current server state
   setStateSync: ({ phase, session, teams, total_questions }) =>
     set({
