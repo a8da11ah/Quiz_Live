@@ -3,7 +3,7 @@ version: "3.9"
 services:
 
   postgres:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     container_name: quizlive_db
     restart: unless-stopped
     environment:

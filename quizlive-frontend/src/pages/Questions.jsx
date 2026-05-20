@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Plus, Search, BookOpen } from 'lucide-react'
 import { getQuestions, getCategories, deleteQuestion } from '../lib/api.js'
 import Button from '../components/common/Button.jsx'
 import QuestionCard from '../components/host/QuestionCard.jsx'
-import { useNavigate } from 'react-router-dom'
+import Layout from '../components/common/Layout.jsx'
 
 const TYPES = ['', 'multiple_choice', 'true_false', 'multiple_select', 'closest_number', 'order_items', 'open_text']
 const DIFFS = ['', 'easy', 'medium', 'hard']
@@ -20,7 +21,12 @@ export default function Questions() {
 
   const load = () => {
     setLoading(true)
-    getQuestions({ q: search || undefined, type: type || undefined, difficulty: difficulty || undefined, category_id: categoryId || undefined })
+    getQuestions({
+      q: search || undefined,
+      type: type || undefined,
+      difficulty: difficulty || undefined,
+      category_id: categoryId || undefined,
+    })
       .then(setQuestions)
       .catch(() => {})
       .finally(() => setLoading(false))
@@ -36,7 +42,7 @@ export default function Questions() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 p-8">
+    <Layout>
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -98,6 +104,6 @@ export default function Questions() {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   )
 }

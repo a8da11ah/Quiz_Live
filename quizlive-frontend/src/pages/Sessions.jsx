@@ -4,6 +4,7 @@ import { Plus, Play, Calendar } from 'lucide-react'
 import { getSessions } from '../lib/api.js'
 import Button from '../components/common/Button.jsx'
 import { StatusBadge } from '../components/common/Badge.jsx'
+import Layout from '../components/common/Layout.jsx'
 
 export default function Sessions() {
   const navigate = useNavigate()
@@ -15,7 +16,7 @@ export default function Sessions() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gray-950 p-8">
+    <Layout>
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -56,6 +57,6 @@ export default function Sessions() {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   )
 }

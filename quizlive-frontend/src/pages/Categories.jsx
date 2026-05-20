@@ -4,6 +4,7 @@ import { getCategories, createCategory, updateCategory, deleteCategory } from '.
 import Button from '../components/common/Button.jsx'
 import Input  from '../components/common/Input.jsx'
 import Modal  from '../components/common/Modal.jsx'
+import Layout from '../components/common/Layout.jsx'
 
 const PRESET_COLORS = ['#6557fb','#e85d24','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6','#64748b']
 
@@ -33,11 +34,10 @@ function CategoryForm({ initial = {}, onSave, loading }) {
 
 export default function Categories() {
   const [categories, setCategories] = useState([])
-  const [modal, setModal] = useState(null)   // null | 'create' | category object
+  const [modal,  setModal]  = useState(null)
   const [saving, setSaving] = useState(false)
 
   const load = () => getCategories().then(setCategories).catch(() => {})
-
   useEffect(() => { load() }, [])
 
   const handleSave = async (body) => {
@@ -61,7 +61,7 @@ export default function Categories() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 p-8">
+    <Layout>
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
@@ -114,6 +114,6 @@ export default function Categories() {
           />
         )}
       </Modal>
-    </div>
+    </Layout>
   )
 }
