@@ -22,6 +22,9 @@ export function useWebSocket(sessionCode, role, token = null) {
 
   const dispatch = useCallback((msg) => {
     switch (msg.type) {
+      case 'state.sync':
+        game.setStateSync(msg.payload)
+        break
       case 'joined':
         game.setJoined(msg.payload)
         break
@@ -90,6 +93,14 @@ export function useWebSocket(sessionCode, role, token = null) {
           ws.send(JSON.stringify({ type, payload }))
         }
       })
+      // Auto-send team.join if navigated from JoinPage (avoids a second WS connection)
+      if (role === 'team') {
+        const pending = sessionStorage.getItem('quizlive_join_payload')
+        if (pending) {
+          ws.send(JSON.stringify({ type: 'team.join', payload: JSON.parse(pending) }))
+          sessionStorage.removeItem('quizlive_join_payload')
+        }
+      }
     }
 
     ws.onmessage = (event) => {

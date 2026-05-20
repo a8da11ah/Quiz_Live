@@ -44,6 +44,20 @@ export const useGameStore = create((set, get) => ({
   pendingMarks: 0,
 
   // Actions
+  // Sent to host on connect — syncs current server state
+  setStateSync: ({ phase, session, teams, total_questions }) =>
+    set({
+      phase: phase === 'lobby' ? 'lobby'
+           : phase === 'question' ? 'question'
+           : phase === 'reveal' ? 'reveal'
+           : phase === 'leaderboard' ? 'leaderboard'
+           : phase === 'finished' ? 'finished'
+           : 'lobby',
+      sessionName: session?.name ?? null,
+      teams: teams ?? [],
+      totalQuestions: total_questions ?? 0,
+    }),
+
   setJoined: ({ team_id, session, teams }) =>
     set({
       phase: 'lobby',
@@ -82,7 +96,11 @@ export const useGameStore = create((set, get) => ({
     set({ teamResult: data }),
 
   setLeaderboard: ({ rankings }) =>
-    set({ leaderboard: rankings }),
+    set((s) => ({
+      leaderboard: rankings,
+      // Advance from reveal → leaderboard so the board screen actually shows
+      phase: s.phase === 'reveal' ? 'leaderboard' : s.phase,
+    })),
 
   recordAnswerReceived: (data) =>
     set((s) => ({
