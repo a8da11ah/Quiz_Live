@@ -11,6 +11,7 @@ import (
 	"quizlive/internal/config"
 	"quizlive/internal/db"
 	"quizlive/internal/handler"
+	"quizlive/internal/hub"
 	"quizlive/internal/middleware"
 	"quizlive/internal/store"
 )
@@ -32,25 +33,34 @@ func main() {
 	}
 	defer pool.Close()
 
-	catStore := store.NewCategoryStore(pool)
-	qStore := store.NewQuestionStore(pool)
+	catStore  := store.NewCategoryStore(pool)
+	qStore    := store.NewQuestionStore(pool)
 	sessStore := store.NewSessionStore(pool)
+	teamStore := store.NewTeamStore(pool)
+
+	gameHub := hub.New(sessStore, qStore, teamStore)
 
 	r := chi.NewRouter()
 	r.Use(chimiddleware.Recoverer)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Cors(cfg))
 
-	// Public
+	// ── Public routes ─────────────────────────────────────────────────────────
 	r.Post("/api/auth/login", handler.Login(cfg))
 	r.Get("/api/health", handler.Health)
 
-	// Host-only (JWT required)
+	// Join info (public — no JWT needed)
+	r.Get("/api/join/{code}", handler.JoinInfo(sessStore))
+
+	// WebSocket (auth handled inside the handler)
+	r.Get("/ws", handler.WsHandler(gameHub, sessStore, qStore, cfg))
+
+	// ── Host-only routes (JWT required) ───────────────────────────────────────
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.JWTAuth(cfg))
 		r.Mount("/api/categories", handler.NewCategoryHandler(catStore).Routes())
-		r.Mount("/api/questions", handler.NewQuestionHandler(qStore).Routes())
-		r.Mount("/api/sessions", handler.NewSessionHandler(sessStore).Routes())
+		r.Mount("/api/questions",  handler.NewQuestionHandler(qStore).Routes())
+		r.Mount("/api/sessions",   handler.NewSessionHandler(sessStore).Routes())
 	})
 
 	// Static SPA — development only (nginx owns this in production)
