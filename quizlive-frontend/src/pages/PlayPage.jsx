@@ -27,20 +27,25 @@ export default function PlayPage() {
     setSubmitted(false)
   }, [question?.session_question_id])
 
-  // If there is no teamId, no pending join, and no stored identity for this
-  // session, the user has no business being here — send them to JoinPage.
-  const hasPendingJoin   = !!sessionStorage.getItem('quizlive_join_payload')
-  const hasStoredTeam    = !!sessionStorage.getItem(`quizlive_team_${code}`)
+  // Snapshot credential state ONCE at mount.  Reading sessionStorage on every
+  // render races with useWebSocket's onopen — which clears the join payload
+  // before the server's `joined` reply arrives.  In that ~1ms window all three
+  // signals would be false and the redirect effect would bounce the user back
+  // to /join, killing the in-flight WebSocket.
+  const [initialCreds] = useState(() => ({
+    hasPendingJoin: !!sessionStorage.getItem('quizlive_join_payload'),
+    hasStoredTeam:  !!sessionStorage.getItem(`quizlive_team_${code}`),
+  }))
 
   useEffect(() => {
-    if (!teamId && phase === 'idle' && !hasPendingJoin && !hasStoredTeam) {
+    if (!teamId && phase === 'idle' && !initialCreds.hasPendingJoin && !initialCreds.hasStoredTeam) {
       navigate(`/join/${code}`, { replace: true })
     }
-  }, [teamId, phase, code, navigate, hasPendingJoin, hasStoredTeam])
+  }, [teamId, phase, code, navigate, initialCreds])
 
-  // Connect whenever we have *any* credential: active teamId, a fresh-join
-  // payload, or a stored identity from a previous join (page refresh).
-  const shouldConnect = !!(teamId || hasPendingJoin || hasStoredTeam)
+  // Connect whenever we have *any* credential.  Using the mount-time snapshot
+  // here as well prevents the WS hook from being re-called with `null` mid-handshake.
+  const shouldConnect = !!(teamId || initialCreds.hasPendingJoin || initialCreds.hasStoredTeam)
   useWebSocket(shouldConnect ? code : null, 'team')
 
   // Handle kicked
