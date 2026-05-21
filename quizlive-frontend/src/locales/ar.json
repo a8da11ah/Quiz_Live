@@ -35,6 +35,127 @@
     "categories": "الفئات",
     "sessions": "الجلسات"
   },
+  "dashboard": {
+    "title": "اللوحة الرئيسية",
+    "subtitle": "مرحباً بعودتك، أيها المضيف",
+    "statSessions": "الجلسات",
+    "statQuestions": "الأسئلة",
+    "statCategories": "الفئات",
+    "recentSessions": "الجلسات الأخيرة",
+    "viewAll": "عرض الكل",
+    "noSessions": "لا توجد جلسات بعد",
+    "createFirst": "أنشئ جلستك الأولى",
+    "noCode": "لا يوجد رمز بعد"
+  },
+  "questions": {
+    "title": "مكتبة الأسئلة",
+    "count": "{{count}} سؤال",
+    "new": "سؤال جديد",
+    "importJson": "استيراد JSON",
+    "allTypes": "كل الأنواع",
+    "allDifficulties": "كل مستويات الصعوبة",
+    "noQuestionsFound": "لا توجد أسئلة",
+    "createQuestion": "أنشئ سؤالاً",
+    "types": {
+      "multiple_choice": "اختيار من متعدد",
+      "true_false": "صح أو خطأ",
+      "multiple_select": "تحديد متعدد",
+      "closest_number": "أقرب رقم",
+      "order_items": "ترتيب العناصر",
+      "open_text": "نص مفتوح"
+    },
+    "difficulty": {
+      "easy": "سهل",
+      "medium": "متوسط",
+      "hard": "صعب"
+    }
+  },
+  "questionForm": {
+    "titleNew": "سؤال جديد",
+    "titleEdit": "تعديل السؤال",
+    "saveQuestion": "حفظ السؤال",
+    "questionType": "نوع السؤال",
+    "questionText": "نص السؤال",
+    "questionTextPlaceholder": "ما هي عاصمة فرنسا؟",
+    "optionsMark": "الخيارات (حدد الإجابة الصحيحة)",
+    "optionsMarkMultiple": "الخيارات (حدد كل الإجابات الصحيحة)",
+    "itemsOrder": "العناصر (رتبها بالترتيب الصحيح)",
+    "optionPlaceholder": "الخيار {{n}}",
+    "addOption": "إضافة خيار",
+    "orderHint": "الترتيب الموضح أعلاه يُعتبر الترتيب الصحيح.",
+    "targetNumber": "الرقم المستهدف",
+    "unitOptional": "الوحدة (اختياري)",
+    "targetPlaceholder": "مثال: 206",
+    "unitPlaceholder": "مثال: عظمة",
+    "referenceAnswer": "الإجابة المرجعية (للمضيف فقط)",
+    "referenceAnswerHint": "تظهر هذه للمضيف أثناء التصحيح، ولا تظهر للفرق.",
+    "referenceAnswerPlaceholder": "معركة هاستينغز",
+    "difficulty": "مستوى الصعوبة",
+    "category": "الفئة",
+    "noCategory": "بدون فئة",
+    "timeLimitLabel": "الحد الزمني (بالثواني، اختياري)",
+    "timeLimitHint": "اتركه فارغاً لاستخدام إعداد الجلسة",
+    "timeLimitPlaceholder": "30",
+    "pointsLabel": "قيمة النقاط (اختياري)",
+    "pointsHint": "اتركه فارغاً لاستخدام إعداد الجلسة",
+    "pointsPlaceholder": "100",
+    "mediaUrl": "رابط الوسائط (اختياري)",
+    "mediaUrlPlaceholder": "https://example.com/image.jpg",
+    "explanation": "الشرح (اختياري)",
+    "explanationPlaceholder": "يظهر بعد الكشف عن الإجابة…",
+    "markCorrect": "تعيين كصحيح",
+    "markIncorrect": "تعيين كخطأ",
+    "correct": "✓ صحيح",
+    "correctQ": "صحيح؟",
+    "types": {
+      "multiple_choice": "اختيار من متعدد",
+      "true_false": "صح أو خطأ",
+      "multiple_select": "تحديد متعدد",
+      "closest_number": "أقرب رقم",
+      "order_items": "ترتيب العناصر",
+      "open_text": "نص مفتوح"
+    },
+    "errors": {
+      "titleRequired": "نص السؤال مطلوب.",
+      "twoOptions": "مطلوب خيارين على الأقل.",
+      "markCorrect": "يرجى تحديد الإجابة الصحيحة.",
+      "markAtLeastOne": "يرجى تحديد إجابة صحيحة واحدة على الأقل.",
+      "targetRequired": "أدخل الرقم المستهدف.",
+      "referenceRequired": "أدخل إجابة مرجعية.",
+      "saveFailed": "فشل حفظ السؤال."
+    }
+  },
+  "importQuestions": {
+    "title": "استيراد الأسئلة من JSON",
+    "hint": "الصق مصفوفة JSON من كائنات الأسئلة. يدعم الصيغة المولّدة بالذكاء الاصطناعي مع علامات <code>is_correct</code> على الخيارات.",
+    "placeholder": "[\n  {\n    \"type\": \"multiple_choice\",\n    \"title\": \"ما هو 2 + 2؟\",\n    \"difficulty\": \"easy\",\n    \"options\": [\n      { \"label\": \"3\", \"is_correct\": false },\n      { \"label\": \"4\", \"is_correct\": true }\n    ]\n  }\n]",
+    "preview": "تم العثور على {{count}} سؤال",
+    "preview_plural": "تم العثور على {{count}} أسئلة",
+    "invalidJson": "JSON غير صالح — يرجى التحقق من الصيغة.",
+    "notArray": "يُتوقع مصفوفة JSON في المستوى الأعلى.",
+    "importing": "جاري الاستيراد…",
+    "import": "استيراد",
+    "successAll": "تم استيراد {{count}} سؤال بنجاح.",
+    "successAll_plural": "تم استيراد {{count}} أسئلة بنجاح.",
+    "successPartial": "تم استيراد {{imported}} من {{total}}. فشل {{failed}}.",
+    "failedAll": "فشل استيراد جميع {{count}} أسئلة.",
+    "errorDetails": "تفاصيل الأخطاء",
+    "errorRow": "#{{index}} \"{{title}}\": {{error}}"
+  },
+  "categories": {
+    "title": "الفئات",
+    "new": "فئة جديدة",
+    "noCategories": "لا توجد فئات بعد",
+    "titleNew": "فئة جديدة",
+    "titleEdit": "تعديل — {{name}}",
+    "form": {
+      "name": "الاسم",
+      "namePlaceholder": "مثال: علوم",
+      "icon": "الأيقونة (رمز تعبيري)",
+      "iconPlaceholder": "📚",
+      "color": "اللون"
+    }
+  },
   "sessions": {
     "title": "الجلسات",
     "new": "جلسة جديدة",
@@ -55,6 +176,8 @@
     "selectedOrder": "المختار (اسحب لإعادة الترتيب)",
     "addedToSession": "تمت الإضافة للجلسة",
     "lobbyHint": "اضغط على <strong>فتح الانتظار</strong> لتوليد رمز الجلسة والبدء في قبول الفرق.",
+    "reorderTitle": "ترتيب الأسئلة",
+    "reorderHint": "اسحب لإعادة الترتيب قبل البدء",
     "status": {
       "draft": "مسودة",
       "lobby": "انتظار",
@@ -65,10 +188,10 @@
     }
   },
   "scoring": {
-    "standard":         { "label": "قياسي",        "desc": "نقاط ثابتة لكل إجابة صحيحة" },
-    "speed_bonus":      { "label": "مكافأة سرعة",  "desc": "نقاط إضافية للإجابة السريعة" },
-    "streak":           { "label": "سلسلة",        "desc": "مضاعف للإجابات الصحيحة المتتالية" },
-    "elimination":      { "label": "إقصاء",        "desc": "إجابة خاطئة = إقصاء الفريق" }
+    "standard":    { "label": "قياسي",       "desc": "نقاط ثابتة لكل إجابة صحيحة" },
+    "speed_bonus": { "label": "مكافأة سرعة", "desc": "نقاط إضافية للإجابة السريعة" },
+    "streak":      { "label": "سلسلة",       "desc": "مضاعف للإجابات الصحيحة المتتالية" },
+    "elimination": { "label": "إقصاء",       "desc": "إجابة خاطئة = إقصاء الفريق" }
   },
   "control": {
     "title": "التحكم في اللعبة",
@@ -105,7 +228,8 @@
   "queue": {
     "title": "قائمة الأسئلة",
     "total": "المجموع {{count}}",
-    "none": "لم يتم تحميل أي أسئلة"
+    "none": "لم يتم تحميل أي أسئلة",
+    "reorderHint": "اسحب لإعادة الترتيب"
   },
   "stats": {
     "title": "إحصائيات سريعة",

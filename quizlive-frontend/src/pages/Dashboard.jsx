@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Zap, BookOpen, FolderOpen, Play, Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { getSessions, getQuestions, getCategories } from '../lib/api.js'
 import Button from '../components/common/Button.jsx'
 import { StatusBadge } from '../components/common/Badge.jsx'
@@ -26,6 +27,7 @@ function StatCard({ icon: Icon, label, value, color = 'brand' }) {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation()
   const [stats, setStats] = useState({})
   const [recentSessions, setRecentSessions] = useState([])
 
@@ -41,32 +43,36 @@ export default function Dashboard() {
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-white">Dashboard</h1>
-            <p className="text-gray-400 text-sm mt-0.5">Welcome back, host</p>
+            <h1 className="text-2xl font-bold text-white">{t('dashboard.title')}</h1>
+            <p className="text-gray-400 text-sm mt-0.5">{t('dashboard.subtitle')}</p>
           </div>
           <Link to="/sessions/new">
-            <Button icon={Plus}>New Session</Button>
+            <Button icon={Plus}>{t('sessions.new')}</Button>
           </Link>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
-          <StatCard icon={Play}       label="Sessions"   value={stats.sessions}   color="brand" />
-          <StatCard icon={BookOpen}   label="Questions"  value={stats.questions}  color="green" />
-          <StatCard icon={FolderOpen} label="Categories" value={stats.categories} color="yellow" />
+          <StatCard icon={Play}       label={t('dashboard.statSessions')}   value={stats.sessions}   color="brand" />
+          <StatCard icon={BookOpen}   label={t('dashboard.statQuestions')}  value={stats.questions}  color="green" />
+          <StatCard icon={FolderOpen} label={t('dashboard.statCategories')} value={stats.categories} color="yellow" />
         </div>
 
         {/* Recent sessions */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">Recent Sessions</h2>
-            <Link to="/sessions" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">View all</Link>
+            <h2 className="text-sm font-medium text-gray-400 uppercase tracking-wider">
+              {t('dashboard.recentSessions')}
+            </h2>
+            <Link to="/sessions" className="text-xs text-brand-400 hover:text-brand-300 transition-colors">
+              {t('dashboard.viewAll')}
+            </Link>
           </div>
           {recentSessions.length === 0 ? (
             <div className="text-center py-12 border border-dashed border-gray-800 rounded-xl">
-              <p className="text-gray-500 mb-3">No sessions yet</p>
+              <p className="text-gray-500 mb-3">{t('dashboard.noSessions')}</p>
               <Link to="/sessions/new">
-                <Button size="sm" icon={Plus}>Create your first session</Button>
+                <Button size="sm" icon={Plus}>{t('dashboard.createFirst')}</Button>
               </Link>
             </div>
           ) : (
@@ -76,7 +82,7 @@ export default function Dashboard() {
                   className="flex items-center gap-4 bg-gray-900 border border-gray-800 rounded-xl px-4 py-3 hover:border-gray-700 transition-colors">
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-white truncate">{s.name}</p>
-                    <p className="text-xs text-gray-500">{s.session_code || 'No code yet'}</p>
+                    <p className="text-xs text-gray-500">{s.session_code || t('dashboard.noCode')}</p>
                   </div>
                   <StatusBadge status={s.status} />
                 </Link>

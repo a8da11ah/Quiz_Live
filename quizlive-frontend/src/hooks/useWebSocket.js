@@ -88,6 +88,9 @@ export function useWebSocket(sessionCode, role, token = null) {
           `Score adjusted: ${msg.payload.delta > 0 ? '+' : ''}${msg.payload.delta}`,
         )
         break
+      case 'queue.updated':
+        game.setQuestionsQueue(msg.payload.questions ?? [])
+        break
       case 'leaderboard.lock':
         game.setLeaderboardLocked(!!msg.payload.locked)
         break

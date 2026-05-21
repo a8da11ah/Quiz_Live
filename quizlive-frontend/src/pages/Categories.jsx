@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Plus, Pencil, Trash2, FolderOpen } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { getCategories, createCategory, updateCategory, deleteCategory } from '../lib/api.js'
 import Button from '../components/common/Button.jsx'
 import Input  from '../components/common/Input.jsx'
@@ -9,16 +10,29 @@ import Layout from '../components/common/Layout.jsx'
 const PRESET_COLORS = ['#6557fb','#e85d24','#10b981','#f59e0b','#ec4899','#06b6d4','#8b5cf6','#64748b']
 
 function CategoryForm({ initial = {}, onSave, loading }) {
+  const { t } = useTranslation()
   const [name,  setName]  = useState(initial.name  || '')
   const [icon,  setIcon]  = useState(initial.icon  || '📚')
   const [color, setColor] = useState(initial.color || PRESET_COLORS[0])
 
   return (
     <div className="flex flex-col gap-4">
-      <Input label="Name" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Science" maxLength={50} />
-      <Input label="Icon (emoji)" value={icon} onChange={(e) => setIcon(e.target.value)} placeholder="📚" maxLength={4} />
+      <Input
+        label={t('categories.form.name')}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder={t('categories.form.namePlaceholder')}
+        maxLength={50}
+      />
+      <Input
+        label={t('categories.form.icon')}
+        value={icon}
+        onChange={(e) => setIcon(e.target.value)}
+        placeholder={t('categories.form.iconPlaceholder')}
+        maxLength={4}
+      />
       <div>
-        <label className="text-sm font-medium text-gray-300 block mb-2">Color</label>
+        <label className="text-sm font-medium text-gray-300 block mb-2">{t('categories.form.color')}</label>
         <div className="flex flex-wrap gap-2">
           {PRESET_COLORS.map((c) => (
             <button key={c} type="button" onClick={() => setColor(c)}
@@ -27,12 +41,15 @@ function CategoryForm({ initial = {}, onSave, loading }) {
           ))}
         </div>
       </div>
-      <Button loading={loading} onClick={() => onSave({ name, icon, color })} className="w-full">Save</Button>
+      <Button loading={loading} onClick={() => onSave({ name, icon, color })} className="w-full">
+        {t('common.save')}
+      </Button>
     </div>
   )
 }
 
 export default function Categories() {
+  const { t } = useTranslation()
   const [categories, setCategories] = useState([])
   const [modal,  setModal]  = useState(null)
   const [saving, setSaving] = useState(false)
@@ -55,7 +72,7 @@ export default function Categories() {
   }
 
   const handleDelete = async (cat) => {
-    if (!confirm(`Delete "${cat.name}"?`)) return
+    if (!confirm(`${t('common.delete')} "${cat.name}"?`)) return
     await deleteCategory(cat.id).catch((e) => alert(e.message))
     load()
   }
@@ -66,15 +83,15 @@ export default function Categories() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <FolderOpen className="text-brand-400" size={22} />
-            <h1 className="text-2xl font-bold text-white">Categories</h1>
+            <h1 className="text-2xl font-bold text-white">{t('categories.title')}</h1>
           </div>
-          <Button icon={Plus} onClick={() => setModal('create')}>New Category</Button>
+          <Button icon={Plus} onClick={() => setModal('create')}>{t('categories.new')}</Button>
         </div>
 
         {categories.length === 0 ? (
           <div className="text-center py-16 border border-dashed border-gray-800 rounded-2xl">
             <FolderOpen size={40} className="text-gray-700 mx-auto mb-3" />
-            <p className="text-gray-500">No categories yet</p>
+            <p className="text-gray-500">{t('categories.noCategories')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
@@ -90,11 +107,13 @@ export default function Categories() {
                 </div>
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button onClick={() => setModal(cat)}
-                    className="p-1.5 rounded-lg text-gray-500 hover:text-brand-400 hover:bg-brand-900/30 transition-colors">
+                    className="p-1.5 rounded-lg text-gray-500 hover:text-brand-400 hover:bg-brand-900/30 transition-colors"
+                    title={t('common.edit')}>
                     <Pencil size={14} />
                   </button>
                   <button onClick={() => handleDelete(cat)}
-                    className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-900/30 transition-colors">
+                    className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-900/30 transition-colors"
+                    title={t('common.delete')}>
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -104,8 +123,10 @@ export default function Categories() {
         )}
       </div>
 
-      <Modal open={!!modal} onClose={() => setModal(null)}
-        title={modal === 'create' ? 'New Category' : `Edit — ${modal?.name}`}>
+      <Modal
+        open={!!modal}
+        onClose={() => setModal(null)}
+        title={modal === 'create' ? t('categories.titleNew') : t('categories.titleEdit', { name: modal?.name })}>
         {modal && (
           <CategoryForm
             initial={modal === 'create' ? {} : modal}

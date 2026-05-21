@@ -35,6 +35,127 @@
     "categories": "Categories",
     "sessions": "Sessions"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Welcome back, host",
+    "statSessions": "Sessions",
+    "statQuestions": "Questions",
+    "statCategories": "Categories",
+    "recentSessions": "Recent Sessions",
+    "viewAll": "View all",
+    "noSessions": "No sessions yet",
+    "createFirst": "Create your first session",
+    "noCode": "No code yet"
+  },
+  "questions": {
+    "title": "Question Library",
+    "count": "{{count}} questions",
+    "new": "New Question",
+    "importJson": "Import JSON",
+    "allTypes": "All types",
+    "allDifficulties": "All difficulties",
+    "noQuestionsFound": "No questions found",
+    "createQuestion": "Create a question",
+    "types": {
+      "multiple_choice": "Multiple Choice",
+      "true_false": "True / False",
+      "multiple_select": "Multiple Select",
+      "closest_number": "Closest Number",
+      "order_items": "Order Items",
+      "open_text": "Open Text"
+    },
+    "difficulty": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    }
+  },
+  "questionForm": {
+    "titleNew": "New Question",
+    "titleEdit": "Edit Question",
+    "saveQuestion": "Save Question",
+    "questionType": "Question Type",
+    "questionText": "Question Text",
+    "questionTextPlaceholder": "What is the capital of France?",
+    "optionsMark": "Options (mark the correct answer)",
+    "optionsMarkMultiple": "Options (mark all correct answers)",
+    "itemsOrder": "Items (set them in the correct order)",
+    "optionPlaceholder": "Option {{n}}",
+    "addOption": "Add option",
+    "orderHint": "The order shown above is treated as the correct order.",
+    "targetNumber": "Target Number",
+    "unitOptional": "Unit (optional)",
+    "targetPlaceholder": "e.g. 206",
+    "unitPlaceholder": "e.g. bones",
+    "referenceAnswer": "Reference Answer (for host's reference)",
+    "referenceAnswerHint": "This is shown to the host during marking, not to teams.",
+    "referenceAnswerPlaceholder": "The Battle of Hastings",
+    "difficulty": "Difficulty",
+    "category": "Category",
+    "noCategory": "No category",
+    "timeLimitLabel": "Time Limit (seconds, optional)",
+    "timeLimitHint": "Leave blank to use session default",
+    "timeLimitPlaceholder": "30",
+    "pointsLabel": "Points Value (optional)",
+    "pointsHint": "Leave blank to use session default",
+    "pointsPlaceholder": "100",
+    "mediaUrl": "Media URL (optional)",
+    "mediaUrlPlaceholder": "https://example.com/image.jpg",
+    "explanation": "Explanation (optional)",
+    "explanationPlaceholder": "Shown after the answer is revealed…",
+    "markCorrect": "Mark as correct",
+    "markIncorrect": "Mark as incorrect",
+    "correct": "✓ Correct",
+    "correctQ": "Correct?",
+    "types": {
+      "multiple_choice": "Multiple Choice",
+      "true_false": "True / False",
+      "multiple_select": "Multiple Select",
+      "closest_number": "Closest Number",
+      "order_items": "Order Items",
+      "open_text": "Open Text"
+    },
+    "errors": {
+      "titleRequired": "Question title is required.",
+      "twoOptions": "At least 2 options are required.",
+      "markCorrect": "Please mark the correct answer.",
+      "markAtLeastOne": "Please mark at least one correct answer.",
+      "targetRequired": "Enter the target number.",
+      "referenceRequired": "Enter a reference answer.",
+      "saveFailed": "Failed to save question."
+    }
+  },
+  "importQuestions": {
+    "title": "Import Questions from JSON",
+    "hint": "Paste a JSON array of question objects. Supports the AI-generated format with <code>is_correct</code> flags on options.",
+    "placeholder": "[\n  {\n    \"type\": \"multiple_choice\",\n    \"title\": \"What is 2 + 2?\",\n    \"difficulty\": \"easy\",\n    \"options\": [\n      { \"label\": \"3\", \"is_correct\": false },\n      { \"label\": \"4\", \"is_correct\": true }\n    ]\n  }\n]",
+    "preview": "{{count}} question found",
+    "preview_plural": "{{count}} questions found",
+    "invalidJson": "Invalid JSON — please check the format.",
+    "notArray": "Expected a JSON array at the top level.",
+    "importing": "Importing…",
+    "import": "Import",
+    "successAll": "Imported {{count}} question successfully.",
+    "successAll_plural": "Imported {{count}} questions successfully.",
+    "successPartial": "Imported {{imported}} of {{total}}. {{failed}} failed.",
+    "failedAll": "All {{count}} questions failed to import.",
+    "errorDetails": "Error details",
+    "errorRow": "#{{index}} \"{{title}}\": {{error}}"
+  },
+  "categories": {
+    "title": "Categories",
+    "new": "New Category",
+    "noCategories": "No categories yet",
+    "titleNew": "New Category",
+    "titleEdit": "Edit — {{name}}",
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "e.g. Science",
+      "icon": "Icon (emoji)",
+      "iconPlaceholder": "📚",
+      "color": "Color"
+    }
+  },
   "sessions": {
     "title": "Sessions",
     "new": "New Session",
@@ -55,6 +176,8 @@
     "selectedOrder": "Selected (drag to reorder)",
     "addedToSession": "Added to session",
     "lobbyHint": "Click <strong>Open Lobby</strong> to generate the session code and start accepting teams.",
+    "reorderTitle": "Question Order",
+    "reorderHint": "Drag to reorder before launching",
     "status": {
       "draft": "Draft",
       "lobby": "Lobby",
@@ -65,10 +188,10 @@
     }
   },
   "scoring": {
-    "standard":         { "label": "Standard",     "desc": "Fixed points per correct answer" },
-    "speed_bonus":      { "label": "Speed Bonus",  "desc": "Extra points for answering fast" },
-    "streak":           { "label": "Streak",       "desc": "Multiplier for consecutive correct answers" },
-    "elimination":      { "label": "Elimination",  "desc": "Wrong answer = team eliminated" }
+    "standard":    { "label": "Standard",    "desc": "Fixed points per correct answer" },
+    "speed_bonus": { "label": "Speed Bonus", "desc": "Extra points for answering fast" },
+    "streak":      { "label": "Streak",      "desc": "Multiplier for consecutive correct answers" },
+    "elimination": { "label": "Elimination", "desc": "Wrong answer = team eliminated" }
   },
   "control": {
     "title": "Game Control",
@@ -105,7 +228,8 @@
   "queue": {
     "title": "Question Queue",
     "total": "{{count}} total",
-    "none": "No questions loaded"
+    "none": "No questions loaded",
+    "reorderHint": "Drag to reorder"
   },
   "stats": {
     "title": "Quick Stats",

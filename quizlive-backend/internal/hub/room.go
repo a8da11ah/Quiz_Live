@@ -156,6 +156,7 @@ func (r *Room) RegisterHost(c *Client) {
 	for i, qs := range r.questions {
 		queue[i] = map[string]any{
 			"index":              i,
+			"question_id":        qs.question.ID,
 			"title":              qs.question.Title,
 			"type":               qs.question.Type,
 			"time_limit_seconds": qs.timeLimitSeconds,
@@ -285,6 +286,15 @@ func (r *Room) handleHostMessage(c *Client, msg InMessage) {
 			return
 		}
 		r.handleLockLeaderboard(p.Locked)
+	case "host.reorder_questions":
+		var p struct {
+			QuestionIDs []uuid.UUID `json:"question_ids"`
+		}
+		if err := json.Unmarshal(msg.Payload, &p); err != nil || len(p.QuestionIDs) == 0 {
+			c.SendError("invalid reorder_questions payload")
+			return
+		}
+		r.handleReorderQuestions(c, p.QuestionIDs)
 	default:
 		c.SendError("unknown message type: " + msg.Type)
 	}
@@ -667,6 +677,73 @@ func (r *Room) handleLockLeaderboard(locked bool) {
 	if host != nil {
 		host.SendMsg("leaderboard.lock", map[string]any{"locked": locked})
 	}
+}
+
+// handleReorderQuestions reorders the in-memory question list to match the
+// supplied question-ID slice and asynchronously persists the new sort_order to
+// the DB.  Only valid during the lobby phase.
+func (r *Room) handleReorderQuestions(c *Client, questionIDs []uuid.UUID) {
+	r.mu.Lock()
+
+	if r.phase != phaseLobby {
+		r.mu.Unlock()
+		c.SendError("can only reorder questions in lobby phase")
+		return
+	}
+
+	// Build ID → state lookup.
+	byQID := make(map[uuid.UUID]questionState, len(r.questions))
+	for _, qs := range r.questions {
+		byQID[qs.question.ID] = qs
+	}
+
+	if len(questionIDs) != len(r.questions) {
+		r.mu.Unlock()
+		c.SendError("reorder list length must match question count")
+		return
+	}
+	for _, qid := range questionIDs {
+		if _, ok := byQID[qid]; !ok {
+			r.mu.Unlock()
+			c.SendError("unknown question id in reorder list")
+			return
+		}
+	}
+
+	// Apply new order in-memory.
+	newQuestions := make([]questionState, len(questionIDs))
+	for i, qid := range questionIDs {
+		qs := byQID[qid]
+		qs.sortOrder = i
+		newQuestions[i] = qs
+	}
+	r.questions = newQuestions
+
+	// Build updated queue payload for the host.
+	queue := make([]map[string]any, len(r.questions))
+	for i, qs := range r.questions {
+		queue[i] = map[string]any{
+			"index":              i,
+			"question_id":        qs.question.ID,
+			"title":              qs.question.Title,
+			"type":               qs.question.Type,
+			"time_limit_seconds": qs.timeLimitSeconds,
+			"points_value":       qs.pointsValue,
+		}
+	}
+
+	sessID := r.sess.ID
+	r.mu.Unlock()
+
+	// Persist to DB in the background so we don't block the WS goroutine.
+	go func() {
+		if err := r.hub.sessStore.ReorderQuestions(context.Background(), sessID, questionIDs); err != nil {
+			slog.Error("persist question reorder", "err", err)
+		}
+	}()
+
+	// Confirm new order to the host.
+	c.SendMsg("queue.updated", map[string]any{"questions": queue})
 }
 
 // handleAdjustScore lets the host nudge a team's score by `delta` (positive or

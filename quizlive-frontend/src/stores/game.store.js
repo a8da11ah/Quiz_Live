@@ -161,6 +161,10 @@ export const useGameStore = create((set, get) => ({
   setLeaderboardLocked: (locked) =>
     set({ leaderboardLocked: locked }),
 
+  // Host-only: directly update the question queue order (after lobby reorder)
+  setQuestionsQueue: (questions) =>
+    set({ questionsQueue: questions }),
+
   setPaused: () =>
     set((s) => ({ phase: 'paused', pausedFrom: s.phase })),
 

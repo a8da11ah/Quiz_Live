@@ -58,6 +58,19 @@ type QuestionFilter struct {
 	Search     *string
 }
 
+// PatchCorrectAnswer updates only the correct_answer column.
+// Used by the bulk importer after real option UUIDs become available.
+func (s *QuestionStore) PatchCorrectAnswer(ctx context.Context, id uuid.UUID, ca json.RawMessage) error {
+	_, err := s.pool.Exec(ctx,
+		`UPDATE questions SET correct_answer = $1, updated_at = NOW() WHERE id = $2`,
+		[]byte(ca), id,
+	)
+	if err != nil {
+		return fmt.Errorf("patch correct_answer: %w", err)
+	}
+	return nil
+}
+
 func (s *QuestionStore) Create(ctx context.Context, in CreateQuestionInput) (*model.Question, error) {
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {

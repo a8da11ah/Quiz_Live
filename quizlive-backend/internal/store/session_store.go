@@ -299,6 +299,28 @@ func (s *SessionStore) ListQuestions(ctx context.Context, sessionID uuid.UUID) (
 	return sqs, rows.Err()
 }
 
+// ReorderQuestions updates the sort_order of session questions to match the
+// given slice of question IDs (index 0 = first question played).
+// Only valid while the session is in lobby status (enforced by the WS handler).
+func (s *SessionStore) ReorderQuestions(ctx context.Context, sessionID uuid.UUID, questionIDs []uuid.UUID) error {
+	tx, err := s.pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	for i, qID := range questionIDs {
+		if _, err := tx.Exec(ctx,
+			`UPDATE session_questions SET sort_order = $1 WHERE session_id = $2 AND question_id = $3`,
+			i, sessionID, qID,
+		); err != nil {
+			return fmt.Errorf("reorder question %v: %w", qID, err)
+		}
+	}
+
+	return tx.Commit(ctx)
+}
+
 func randomCode(n int) string {
 	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	b := make([]byte, n)

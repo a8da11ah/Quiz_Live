@@ -52,6 +52,7 @@ export const getQuestion     = (id)        => api.get(`/questions/${id}`)
 export const createQuestion  = (body)      => api.post('/questions', body)
 export const updateQuestion  = (id, body)  => api.put(`/questions/${id}`, body)
 export const deleteQuestion  = (id)        => api.delete(`/questions/${id}`)
+export const importQuestions = (items)     => api.post('/questions/import', items)
 
 // Sessions
 export const getSessions     = (params = {}) => {
